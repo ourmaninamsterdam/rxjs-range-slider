@@ -1,9 +1,9 @@
 {
-  "name": "js-library-template",
+  "name": "rxjs-range-slider",
   "author": "Justin Perry",
   "version": "0.0.0",
-  "description": "Base config for a JavaScript library. Includes Rollup, Prettier, ESLint, Babel and Flow",
-  "repository": "js-library-template",
+  "description": "A range slider built using RxJS",
+  "repository": "rxjs-range-slider",
   "scripts": {
     "test": "jest --env=jsdom",
     "test:watch": "jest --watchAll --env=jsdom",
@@ -25,7 +25,8 @@
     "node": ">=8"
   },
   "dependencies": {
-    "flow-typed": "^2.4.0"
+    "flow-typed": "^2.4.0",
+    "rxjs": "^6.5.3"
   },
   "devDependencies": {
     "@babel/core": "^7.4.4",
@@ -49,7 +50,7 @@
     "eslint-plugin-node": "^7.0.1",
     "eslint-plugin-prettier": "^2.6.0",
     "eslint-plugin-promise": "^4.0.0",
-    "flow-bin": "0.75.0",
+    "flow-bin": "^0.109.0",
     "jest": "^24.8.0",
     "rollup": "^1.11.3",
     "rollup-plugin-babel": "^4.3.2",
