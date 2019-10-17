@@ -1,6 +1,11 @@
-# library-template
+# rxjs-range-slider
 
-Setup for building JavaScript libraries (using Rollup) with the following: Babel (7.x), Jest, Flow (0.75), ESLint and Prettier.
+Keyboard-driven range slider using RxJS.
+
+*To do*
+* Fix RxJS imports
+* Add mouse dragging
+* Improve accessibility
 
 ## Setup
 
