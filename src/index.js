@@ -100,25 +100,39 @@ const rxRangeSlider = ({
 
   const incrementLowerRange$ = pipe(
     filter(isRightKey),
-    map(() => state => stateReducer(state, { type: INCREMENT_LOWER }))
+    map((): Function => (state: STATE): Function =>
+      stateReducer(state, { type: INCREMENT_LOWER })
+    )
   )(handleStartNode$);
 
   const decrementLowerRange$ = pipe(
     filter(isLeftKey),
-    map(() => state => stateReducer(state, { type: DECREMENT_LOWER }))
+    map((): Function => (state: STATE): Function =>
+      stateReducer(state, { type: DECREMENT_LOWER })
+    )
   )(handleStartNode$);
 
   const incrementUpperRange$ = pipe(
     filter(isRightKey),
-    map(() => state => stateReducer(state, { type: INCREMENT_UPPER }))
+    map((): Function => (state: STATE): Function =>
+      stateReducer(state, { type: INCREMENT_UPPER })
+    )
   )(handleEndNode$);
 
   const decrementUpperRange$ = pipe(
     filter(isLeftKey),
-    map(() => state => stateReducer(state, { type: DECREMENT_UPPER }))
+    map((): Function => (state: STATE): Function =>
+      stateReducer(state, { type: DECREMENT_UPPER })
+    )
   )(handleEndNode$);
 
-  const drawRange = (nodes, currentStart, currentEnd, rangeStart, rangeEnd) => {
+  const drawRange = (
+    nodes,
+    currentStart,
+    currentEnd,
+    rangeStart,
+    rangeEnd
+  ): void => {
     const container = nodes[0].parentNode;
     const width = Math.abs(((currentStart - currentEnd) / rangeEnd) * 100);
     const left = (currentStart / rangeEnd) * 100;
@@ -134,11 +148,12 @@ const rxRangeSlider = ({
   );
 
   const state$ = pipe(
-    scan((state, change) => change(state), {
+    scan((state: STATE, change: Function): Function => change(state), {
       start: stepStart,
       end: stepEnd
     }),
-    tap((state: Object) =>
+    //$FlowFixMe
+    tap((state: STATE) =>
       drawRange(
         [rangeNode, handlesContainerNode],
         state.start,
