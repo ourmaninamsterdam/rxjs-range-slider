@@ -47,18 +47,29 @@ const createSlider = config => {
   };
 };
 
-describe('rxRangeSlider', () => {
-  const KEY_LEFT = 37;
-  const KEY_RIGHT = 39;
+const KEY_LEFT = 37;
+const KEY_RIGHT = 39;
 
-  const arrowKeyRightEvent = new KeyboardEvent('keydown', {
-    bubbles: true,
-    cancelable: true,
-    shiftKey: false,
-    keyCode: KEY_RIGHT
+const arrowKeyRightEvent = new KeyboardEvent('keydown', {
+  bubbles: true,
+  cancelable: true,
+  shiftKey: false,
+  keyCode: KEY_RIGHT
+});
+
+const arrowKeyLeftEvent = new KeyboardEvent('keydown', {
+  bubbles: true,
+  cancelable: true,
+  shiftKey: false,
+  keyCode: KEY_LEFT
+});
+
+describe('rxRangeSlider', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
   });
 
-  it('should increase the start value by the step size', done => {
+  it('should increase the start value by the step size when the right arrow key is clicked', done => {
     const { slider: myRxRangeSlider, handleStartNode } = createSlider({
       bounds: [0, 5000],
       start: [250, 1000],
@@ -70,6 +81,45 @@ describe('rxRangeSlider', () => {
       done();
     });
 
+    myRxRangeSlider.subscribe(state => {
+      expect(state.start).toEqual(750);
+      done();
+    });
+
+    myRxRangeSlider.subscribe(state => {
+      expect(state.start).toEqual(1000);
+      done();
+    });
+
     handleStartNode.dispatchEvent(arrowKeyRightEvent);
+    handleStartNode.dispatchEvent(arrowKeyRightEvent);
+    handleStartNode.dispatchEvent(arrowKeyRightEvent);
+  });
+
+  it('should increase the start value by the step size when the left arrow key is clicked', done => {
+    const { slider: myRxRangeSlider, handleStartNode } = createSlider({
+      bounds: [0, 5000],
+      start: [1000, 2000],
+      stepSize: 250
+    });
+
+    myRxRangeSlider.subscribe(state => {
+      expect(state.start).toEqual(750);
+      done();
+    });
+
+    myRxRangeSlider.subscribe(state => {
+      expect(state.start).toEqual(500);
+      done();
+    });
+
+    myRxRangeSlider.subscribe(state => {
+      expect(state.start).toEqual(250);
+      done();
+    });
+
+    handleStartNode.dispatchEvent(arrowKeyLeftEvent);
+    handleStartNode.dispatchEvent(arrowKeyLeftEvent);
+    handleStartNode.dispatchEvent(arrowKeyLeftEvent);
   });
 });
