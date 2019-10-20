@@ -18,8 +18,15 @@ type STATE = {
   start: number,
   end: number
 };
+const KEY_LEFT = 37;
+const KEY_RIGHT = 39;
+const VALID_KEYS = [KEY_LEFT, KEY_RIGHT];
+
+const isLeftKey = (e: KeyboardEvent): boolean => e.keyCode === KEY_LEFT;
+const isRightKey = (e: KeyboardEvent): boolean => e.keyCode === KEY_RIGHT;
 
 const formatAsPercentage = (num: number): string => `${num}%`;
+
 const restrictToRange = (min: number, max: number, num: number): number =>
   Math.min(Math.max(min, num), max);
 
@@ -70,6 +77,23 @@ const createStateReducer = ({
   return stateReducer;
 };
 
+const drawRange = (
+  nodes: Array<HTMLElement>,
+  currentStart: number,
+  currentEnd: number,
+  rangeStart: number,
+  rangeEnd: number
+): void => {
+  const container = nodes[0].parentNode;
+  const width = Math.abs(((currentStart - currentEnd) / rangeEnd) * 100);
+  const left = (currentStart / rangeEnd) * 100;
+
+  Array.prototype.slice.call(nodes).forEach((node: HTMLElement): void => {
+    node.style.left = formatAsPercentage(restrictToRange(0, 100, left));
+    node.style.width = formatAsPercentage(restrictToRange(0, 100, width));
+  });
+};
+
 const rxRangeSlider = ({
   rangeNode,
   handlesContainerNode,
@@ -87,17 +111,10 @@ const rxRangeSlider = ({
   stepSize: number,
   bounds: Array<number>
 }) => {
-  const KEY_LEFT = 37;
-  const KEY_RIGHT = 39;
-  const VALID_KEYS = [KEY_LEFT, KEY_RIGHT];
-
-  const isLeftKey = (e: KeyboardEvent): boolean => e.keyCode === KEY_LEFT;
-  const isRightKey = (e: KeyboardEvent): boolean => e.keyCode === KEY_RIGHT;
+  const stateReducer = createStateReducer({ rangeStart, rangeEnd, stepSize });
 
   const handleStartNode$ = fromEvent(handleStartNode, 'keydown');
   const handleEndNode$ = fromEvent(handleEndNode, 'keydown');
-
-  const stateReducer = createStateReducer({ rangeStart, rangeEnd, stepSize });
 
   const incrementLowerRange$ = pipe(
     filter(isRightKey),
@@ -126,23 +143,6 @@ const rxRangeSlider = ({
       stateReducer(state, { type: DECREMENT_UPPER })
     )
   )(handleEndNode$);
-
-  const drawRange = (
-    nodes: Array<HTMLElement>,
-    currentStart: number,
-    currentEnd: number,
-    rangeStart: number,
-    rangeEnd: number
-  ): void => {
-    const container = nodes[0].parentNode;
-    const width = Math.abs(((currentStart - currentEnd) / rangeEnd) * 100);
-    const left = (currentStart / rangeEnd) * 100;
-
-    Array.prototype.slice.call(nodes).forEach((node: HTMLElement): void => {
-      node.style.left = formatAsPercentage(restrictToRange(0, 100, left));
-      node.style.width = formatAsPercentage(restrictToRange(0, 100, width));
-    });
-  };
 
   const mergedRanges$ = incrementLowerRange$.pipe(
     merge(decrementLowerRange$, incrementUpperRange$, decrementUpperRange$)
