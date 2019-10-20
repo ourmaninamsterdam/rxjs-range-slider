@@ -19,6 +19,56 @@ type STATE = {
   end: number
 };
 
+const formatCSSPercentage = num => `${num}%`;
+const restrictToRange = (min, max, num) => Math.min(Math.max(min, num), max);
+
+const createStateReducer = ({
+  rangeStart,
+  rangeEnd,
+  stepSize
+}: {
+  rangeStart: number,
+  rangeEnd: number,
+  stepSize: number
+}): Function => {
+  const stateReducer = (
+    state: STATE,
+    action: {
+      type: STATE_ACTION_TYPES
+    }
+  ): STATE => {
+    switch (action.type) {
+      case INCREMENT_LOWER:
+        return {
+          ...state,
+          start: restrictToRange(rangeStart, state.end, state.start + stepSize)
+        };
+      case DECREMENT_LOWER:
+        return {
+          ...state,
+          start: restrictToRange(rangeStart, rangeEnd, state.start - stepSize)
+        };
+
+      case INCREMENT_UPPER:
+        return {
+          ...state,
+          end: restrictToRange(rangeStart, rangeEnd, state.end + stepSize)
+        };
+
+      case DECREMENT_UPPER:
+        return {
+          ...state,
+          end: restrictToRange(state.start, rangeEnd, state.end - stepSize)
+        };
+
+      default:
+        return state;
+    }
+  };
+
+  return stateReducer;
+};
+
 const rxRangeSlider = ({
   rangeNode,
   handlesContainerNode,
@@ -42,11 +92,11 @@ const rxRangeSlider = ({
 
   const isLeftKey = e => e.keyCode === KEY_LEFT;
   const isRightKey = e => e.keyCode === KEY_RIGHT;
-  const formatCSSPercentage = num => `${num}%`;
-  const restrictToRange = (min, max, num) => Math.min(Math.max(min, num), max);
 
   const handleStartNode$ = fromEvent(handleStartNode, 'keydown');
   const handleEndNode$ = fromEvent(handleEndNode, 'keydown');
+
+  const stateReducer = createStateReducer({ rangeStart, rangeEnd, stepSize });
 
   const incrementLowerRange$ = pipe(
     filter(isRightKey),
@@ -77,40 +127,6 @@ const rxRangeSlider = ({
       node.style.left = formatCSSPercentage(restrictToRange(0, 100, left));
       node.style.width = formatCSSPercentage(restrictToRange(0, 100, width));
     });
-  };
-
-  const stateReducer = (
-    state: STATE,
-    action: {
-      type: STATE_ACTION_TYPES
-    }
-  ): STATE => {
-    if (action.type === INCREMENT_LOWER) {
-      return {
-        ...state,
-        start: restrictToRange(rangeStart, state.end, state.start + stepSize)
-      };
-    }
-    if (action.type === DECREMENT_LOWER) {
-      return {
-        ...state,
-        start: restrictToRange(rangeStart, rangeEnd, state.start - stepSize)
-      };
-    }
-    if (action.type === INCREMENT_UPPER) {
-      return {
-        ...state,
-        end: restrictToRange(rangeStart, rangeEnd, state.end + stepSize)
-      };
-    }
-    if (action.type === DECREMENT_UPPER) {
-      return {
-        ...state,
-        end: restrictToRange(state.start, rangeEnd, state.end - stepSize)
-      };
-    }
-
-    return state;
   };
 
   const mergedRanges$ = incrementLowerRange$.pipe(
