@@ -19,8 +19,9 @@ type STATE = {
   end: number
 };
 
-const formatCSSPercentage = num => `${num}%`;
-const restrictToRange = (min, max, num) => Math.min(Math.max(min, num), max);
+const formatAsPercentage = (num: number): string => `${num}%`;
+const restrictToRange = (min: number, max: number, num: number): number =>
+  Math.min(Math.max(min, num), max);
 
 const createStateReducer = ({
   rangeStart,
@@ -90,8 +91,8 @@ const rxRangeSlider = ({
   const KEY_RIGHT = 39;
   const VALID_KEYS = [KEY_LEFT, KEY_RIGHT];
 
-  const isLeftKey = e => e.keyCode === KEY_LEFT;
-  const isRightKey = e => e.keyCode === KEY_RIGHT;
+  const isLeftKey = (e: KeyboardEvent): boolean => e.keyCode === KEY_LEFT;
+  const isRightKey = (e: KeyboardEvent): boolean => e.keyCode === KEY_RIGHT;
 
   const handleStartNode$ = fromEvent(handleStartNode, 'keydown');
   const handleEndNode$ = fromEvent(handleEndNode, 'keydown');
@@ -127,19 +128,19 @@ const rxRangeSlider = ({
   )(handleEndNode$);
 
   const drawRange = (
-    nodes,
-    currentStart,
-    currentEnd,
-    rangeStart,
-    rangeEnd
+    nodes: Array<HTMLElement>,
+    currentStart: number,
+    currentEnd: number,
+    rangeStart: number,
+    rangeEnd: number
   ): void => {
     const container = nodes[0].parentNode;
     const width = Math.abs(((currentStart - currentEnd) / rangeEnd) * 100);
     const left = (currentStart / rangeEnd) * 100;
 
-    Array.prototype.slice.call(nodes).forEach(node => {
-      node.style.left = formatCSSPercentage(restrictToRange(0, 100, left));
-      node.style.width = formatCSSPercentage(restrictToRange(0, 100, width));
+    Array.prototype.slice.call(nodes).forEach((node: HTMLElement): void => {
+      node.style.left = formatAsPercentage(restrictToRange(0, 100, left));
+      node.style.width = formatAsPercentage(restrictToRange(0, 100, width));
     });
   };
 
