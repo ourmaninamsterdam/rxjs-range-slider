@@ -1,7 +1,23 @@
 // @flow
 
-import { fromEvent } from 'rxjs';
-import { merge } from 'rxjs/operators';
+import { fromEvent, pipe } from 'rxjs';
+import { merge, filter, map, scan, tap, mergeMap } from 'rxjs/operators';
+
+const INCREMENT_LOWER = 'INCREMENT_LOWER';
+const DECREMENT_LOWER = 'DECREMENT_LOWER';
+const INCREMENT_UPPER = 'INCREMENT_UPPER';
+const DECREMENT_UPPER = 'DECREMENT_UPPER';
+
+type STATE_ACTION_TYPES =
+  | typeof INCREMENT_LOWER
+  | typeof INCREMENT_UPPER
+  | typeof DECREMENT_LOWER
+  | typeof DECREMENT_UPPER;
+
+type STATE = {
+  start: number,
+  end: number
+};
 
 const rxRangeSlider = ({
   rangeNode,
@@ -23,10 +39,6 @@ const rxRangeSlider = ({
   const KEY_LEFT = 37;
   const KEY_RIGHT = 39;
   const VALID_KEYS = [KEY_LEFT, KEY_RIGHT];
-  const INCREMENT_LOWER = 'INCREMENT_LOWER';
-  const DECREMENT_LOWER = 'DECREMENT_LOWER';
-  const INCREMENT_UPPER = 'INCREMENT_UPPER';
-  const DECREMENT_UPPER = 'DECREMENT_UPPER';
 
   const isLeftKey = e => e.keyCode === KEY_LEFT;
   const isRightKey = e => e.keyCode === KEY_RIGHT;
@@ -36,18 +48,25 @@ const rxRangeSlider = ({
   const handleStartNode$ = fromEvent(handleStartNode, 'keydown');
   const handleEndNode$ = fromEvent(handleEndNode, 'keydown');
 
-  const incrementLowerRange$ = merge(handleStartNode$)
-    .filter(isRightKey)
-    .map(() => state => stateReducer(state, { type: INCREMENT_LOWER }));
-  const decrementLowerRange$ = merge(handleStartNode$)
-    .filter(isLeftKey)
-    .map(() => state => stateReducer(state, { type: DECREMENT_LOWER }));
-  const incrementUpperRange$ = merge(handleEndNode$)
-    .filter(isRightKey)
-    .map(() => state => stateReducer(state, { type: INCREMENT_UPPER }));
-  const decrementUpperRange$ = merge(handleEndNode$)
-    .filter(isLeftKey)
-    .map(() => state => stateReducer(state, { type: DECREMENT_UPPER }));
+  const incrementLowerRange$ = pipe(
+    filter(isRightKey),
+    map(() => state => stateReducer(state, { type: INCREMENT_LOWER }))
+  )(handleStartNode$);
+
+  const decrementLowerRange$ = pipe(
+    filter(isLeftKey),
+    map(() => state => stateReducer(state, { type: DECREMENT_LOWER }))
+  )(handleStartNode$);
+
+  const incrementUpperRange$ = pipe(
+    filter(isRightKey),
+    map(() => state => stateReducer(state, { type: INCREMENT_UPPER }))
+  )(handleEndNode$);
+
+  const decrementUpperRange$ = pipe(
+    filter(isLeftKey),
+    map(() => state => stateReducer(state, { type: DECREMENT_UPPER }))
+  )(handleEndNode$);
 
   const drawRange = (nodes, currentStart, currentEnd, rangeStart, rangeEnd) => {
     const container = nodes[0].parentNode;
@@ -60,7 +79,12 @@ const rxRangeSlider = ({
     });
   };
 
-  const stateReducer = (state, action) => {
+  const stateReducer = (
+    state: STATE,
+    action: {
+      type: STATE_ACTION_TYPES
+    }
+  ): STATE => {
     if (action.type === INCREMENT_LOWER) {
       return {
         ...state,
@@ -80,7 +104,6 @@ const rxRangeSlider = ({
       };
     }
     if (action.type === DECREMENT_UPPER) {
-      console.log(DECREMENT_UPPER);
       return {
         ...state,
         end: restrictToRange(state.start, rangeEnd, state.end - stepSize)
@@ -90,18 +113,16 @@ const rxRangeSlider = ({
     return state;
   };
 
-  const state$ = merge(
-    incrementLowerRange$,
-    decrementLowerRange$,
-    incrementUpperRange$,
-    decrementUpperRange$
-  ).scan((state, change) => change(state), {
-    start: stepStart,
-    end: stepEnd
-  });
+  const mergedRanges$ = incrementLowerRange$.pipe(
+    merge(decrementLowerRange$, incrementUpperRange$, decrementUpperRange$)
+  );
 
-  state$
-    .do(state =>
+  const state$ = pipe(
+    scan((state, change) => change(state), {
+      start: stepStart,
+      end: stepEnd
+    }),
+    tap((state: Object) =>
       drawRange(
         [rangeNode, handlesContainerNode],
         state.start,
@@ -110,7 +131,7 @@ const rxRangeSlider = ({
         rangeEnd
       )
     )
-    .subscribe();
+  )(mergedRanges$);
 
   drawRange(
     [rangeNode, handlesContainerNode],
