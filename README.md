@@ -3,7 +3,7 @@
 Keyboard-driven range slider using RxJS.
 
 *To do*
-* Fix RxJS imports
+* _DONE Fix RxJS imports (bump to RxJS 6)_
 * Add mouse dragging
 * Improve accessibility
 
