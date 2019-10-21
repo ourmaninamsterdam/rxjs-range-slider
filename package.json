@@ -13,6 +13,7 @@
     "start": "rollup -c -w"
   },
   "main": "dist/index.js",
+  "umd": "dist/index.umd.js",
   "module": "dist/index.es.js",
   "jsnext:main": "dist/index.es.js",
   "files": [

@@ -22,6 +22,12 @@ export default {
       file: pkg.main,
       format: 'cjs',
       sourcemap: true
+    },
+    {
+      file: pkg.umd,
+      format: 'umd',
+      sourcemap: true,
+      name: 'rxRangeSlider'
     }
   ],
   plugins: [
