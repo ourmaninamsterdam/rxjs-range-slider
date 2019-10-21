@@ -1,7 +1,7 @@
 // @flow
 
 import { fromEvent, pipe } from 'rxjs';
-import { merge, filter, map, scan, tap, mergeMap } from 'rxjs/operators';
+import { merge, filter, map, scan, tap } from 'rxjs/operators';
 
 const INCREMENT_LOWER = 'INCREMENT_LOWER';
 const DECREMENT_LOWER = 'DECREMENT_LOWER';
@@ -85,7 +85,7 @@ const drawRange = (
   rangeEnd: number
 ): void => {
   const container = nodes[0].parentNode;
-  const width = Math.abs(((currentStart - currentEnd) / rangeEnd) * 100);
+  const width = ((currentStart - currentEnd) / rangeEnd) * 100;
   const left = (currentStart / rangeEnd) * 100;
 
   Array.prototype.slice.call(nodes).forEach((node: HTMLElement): void => {
