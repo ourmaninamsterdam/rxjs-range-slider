@@ -69,7 +69,7 @@ describe('rxRangeSlider', () => {
     document.body.innerHTML = '';
   });
 
-  it('should increase the start value by the step size when the right arrow key is clicked', done => {
+  it.skip('should increase the start value by the step size when the right arrow key is clicked', done => {
     const { slider: myRxRangeSlider, handleStartNode } = createSlider({
       bounds: [0, 5000],
       start: [250, 1000],
@@ -96,7 +96,7 @@ describe('rxRangeSlider', () => {
     handleStartNode.dispatchEvent(arrowKeyRightEvent);
   });
 
-  it('should decrease the start value by the step size when the left arrow key is clicked', done => {
+  it.skip('should decrease the start value by the step size when the left arrow key is clicked', done => {
     const { slider: myRxRangeSlider, handleStartNode } = createSlider({
       bounds: [0, 5000],
       start: [1000, 2000],
