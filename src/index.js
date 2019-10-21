@@ -49,7 +49,11 @@ const createStateReducer = ({
       case INCREMENT_LOWER:
         return {
           ...state,
-          start: restrictToRange(rangeStart, state.end, state.start + stepSize)
+          start: restrictToRange(
+            rangeStart,
+            state.end - stepSize,
+            state.start + stepSize
+          )
         };
       case DECREMENT_LOWER:
         return {
@@ -66,7 +70,11 @@ const createStateReducer = ({
       case DECREMENT_UPPER:
         return {
           ...state,
-          end: restrictToRange(state.start, rangeEnd, state.end - stepSize)
+          end: restrictToRange(
+            state.start + stepSize,
+            rangeEnd,
+            state.end - stepSize
+          )
         };
 
       default:
