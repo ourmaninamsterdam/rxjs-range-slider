@@ -85,9 +85,10 @@ const drawRange = (
   rangeEnd: number
 ): void => {
   const container = nodes[0].parentNode;
-  const width = ((currentStart - currentEnd) / rangeEnd) * 100;
+  const width = Math.abs(((currentStart - currentEnd) / rangeEnd) * 100);
   const left = (currentStart / rangeEnd) * 100;
-
+  console.log('rangeEnd', rangeEnd);
+  console.log(width, left, 'yay');
   Array.prototype.slice.call(nodes).forEach((node: HTMLElement): void => {
     node.style.left = formatAsPercentage(restrictToRange(0, 100, left));
     node.style.width = formatAsPercentage(restrictToRange(0, 100, width));
