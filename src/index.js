@@ -118,6 +118,29 @@ const rxRangeSlider = ({
   stepSize: number,
   bounds: Array<number>
 }) => {
+  if (
+    stepStart < rangeStart ||
+    stepStart > rangeEnd ||
+    stepStart >= stepEnd ||
+    stepEnd < rangeStart ||
+    stepEnd > rangeEnd
+  ) {
+    throw new Error('rxRangeSlider: "start" bounds are out of range');
+  }
+
+  if (
+    !rangeNode ||
+    !handlesContainerNode ||
+    !handleStartNode ||
+    !handleEndNode ||
+    (!rangeNode.nodeType ||
+      !handlesContainerNode.nodeType ||
+      !handleStartNode.nodeType ||
+      !handleEndNode.nodeType)
+  ) {
+    throw new Error('rxRangeSlider: Invalid DOM elements');
+  }
+
   const stateReducer = createStateReducer({ rangeStart, rangeEnd, stepSize });
 
   const handleStartNode$ = fromEvent(handleStartNode, 'keydown');
